@@ -1,0 +1,44 @@
+/** @define Header; use-strict */
+
+.Header {
+  position: relative;
+  transition: all cubic-bezier(.49,.51,.56,.96 ) 350ms;
+  width: 100%;
+}
+
+.Header--bordered {
+  border-right: 2px solid #e6e6e6;
+}
+
+.Header-heading,
+.Header-heading * {
+  margin: 0;
+  display: block;
+  text-decoration: none;
+  line-height: 1em;
+  border: 0;
+  font-size: 1.4em;
+  font-family: 'Helvetica', sans-serif;
+}
+
+.Header-info {
+  font-size: 0.8em;
+}
+
+.Header-info > a:after {
+  content: '\A';
+  white-space: pre;
+}
+
+.Header-info,
+.Header-heading {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 690px) {
+  .Header {
+    position: static;
+    border: none;
+  }
+}

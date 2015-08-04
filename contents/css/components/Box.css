@@ -1,0 +1,20 @@
+/** @define Box; use-strict */
+
+.Box {
+  background-color: #fdfdfd;
+  padding: 0.5em;
+  margin: 0.5em;
+}
+
+.Box ~ .Box {
+  margin-top: 0.5em;
+}
+
+.Box--transparent {
+  background: transparent;
+  box-shadow: none;
+}
+
+.Box--thin {
+  padding: 0;
+}

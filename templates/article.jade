@@ -1,0 +1,35 @@
+
+extends layout
+
+block append vars
+  - var blogClass = 'is-article'
+
+block prepend title
+  | #{ page.title + " - "}
+
+block header
+  div.Header.Header--bordered
+    div.Box.Box--transparent
+      a(href=contents.index.url).Header-heading
+        each result, i in locals.name.split(' ')
+          h1= result
+    div.Box.Box--transparent
+      span.Date= moment.utc(page.date).format('DD MMMM YYYY')
+    div.Box
+      h4 References
+      div.Header-info
+    div.Box
+      div.Links
+        a.Links-social(href='http://plus.google.com/share?url=#{locals.url.replace(/\/+$/, "") + page.url}', target='_blank', title='Share on Facebook')= 'c'
+        a.Links-social(href='https://twitter.com/intent/tweet?url=#{locals.url.replace(/\/+$/, "") + page.url}&text=#{page.title}', target='_blank', title='Share on Twitter')= 'a'
+        a.Links-social(href='http://facebook.com/sharer/sharer.php?u=#{locals.url.replace(/\/+$/, "") + page.url}', target='_blank', title='Share on Facebook')= 'b' 
+
+block content
+  div.Box.Box--transparent
+    article.Article
+      section.Article-header
+        h2= page.title
+      section.Article-body!= typogr(page.html).typogrify()
+  div.Box.Box--transparent.Box--thin
+    div.copy
+      | copyright &copy; 2015 Eric McDaniel

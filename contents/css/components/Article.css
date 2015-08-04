@@ -1,0 +1,57 @@
+.Article {
+}
+
+.Article-date {
+  margin-bottom: 1em;
+}
+
+.Article-header > h1,
+.Article-header > h2,
+.Article-header > h3 {
+  margin: 0;
+  margin-bottom: 0.2em;
+}
+
+.Article-header > * > a {
+  text-decoration: none;
+}
+
+.Article--intro > .Article-body > p {
+  display: inline;
+}
+
+.Article-body {
+
+}
+
+.Article-body > code,
+.Article-body > p > code {
+  padding: 2px;
+}
+
+.Article-body > p {
+  margin: 1em 0;
+}
+
+.Article-body > p:first-of-type {
+  font-size: 0.8em;
+  margin-top: 0;
+}
+
+.Article-body > p:first-of-type + p {
+  margin-top: 2em;
+}
+
+.Article-body > p > img {
+  display: block;
+  margin: 0 auto;
+}
+
+.more, .date {
+  font-family: 'Arial', serif;
+  font-variant: small-caps;
+  text-transform: lowercase;
+  font-weight: 400;
+  text-rendering: auto;
+  letter-spacing: 1px;
+}

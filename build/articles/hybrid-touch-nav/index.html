@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+    <title>On Hybrid Mobile Navigation - Eric McDaniel - fun with the web
+    </title>
+    <link rel="alternate" href="http://ericmcd.com//feed.xml" type="application/rss+xml" title="fun with the web">
+    <link rel="stylesheet" href="/bundle.css">
+  </head>
+  <body>
+    <div class="Blog is-article">
+      <header class="Blog-header">
+        <div class="Header">
+          <div class="Box">
+            <section class="Links"><a href="/">Eric McDaniel</a></section>
+          </div>
+          <div class="Header-right">
+            <div class="Box Info"><span class="Date">28 October 2014</span></div>
+          </div>
+        </div>
+      </header>
+      <main class="Blog-content u-cf">
+        <div class="Box">
+          <article class="Article">
+            <section class="Article-header">
+              <h1>On Hybrid Mobile Navigation</h1>
+            </section>
+            <section class="Article-body"><p>Recreating mobile navigation in a hybrid mobile&nbsp;app.</p>
+<p><span class="more"></span></p>
+<h2 id="the-mobile-web-vs-hybrid-applications">The Mobile Web vs. Hybrid&nbsp;Applications</h2>
+<p>If you aren’t familiar with the term “hybrid app”, it describes an application that is written in front-end web languages like <span class="caps">HTML</span>, CSS and JavaScript, and installed natively on mobile devices. Check out <a href="http://cordova.apache.org/">Apache Cordova</a> for more&nbsp;information.</p>
+<p>A hybrid app should not be a considered a packaged website. It is an application that emulates native mobile <span class="caps">UI</span>/UX while benefiting from the kind learning curve and tooling options (among other things) of web languages. These benefits do have a drawback: it’s actually <em>really hard</em> to make a <span class="caps">UI</span> feel fluid and native in a hybrid app, especially on older&nbsp;devices.</p>
+<p>Many articles already exist that cover <span class="caps">CSS</span> transition optimizations and other mobile performance concerns. Instead of blabbing about <code>translate: transform3d()</code>, composite layers, and repaints, I wanted to discuss the recreation of an iconic native app <span class="caps">UI</span> element in a hybrid app: the off canvas navigation (like the one below from HTC One’s <a href="https://play.google.com/store/apps/details?id=com.htc.launcher&amp;hl=en">BlinkFeed</a>).</p>
+<p><img src="/img/mobile_nav.gif" alt="HTC One Highlights"></p>
+<h2 id="disclaimer">Disclaimer</h2>
+<ul>
+<li>This is not a one-size-fits-all solution. I’ll be using a lot of code examples, but it’s up to the developer to implement them in her&nbsp;project.</li>
+<li>Since I am not formally trained as a front end developer, I will try to keep my diction clear and concise rather than&nbsp;conventional.</li>
+</ul>
+<h2 id="process">Process</h2>
+<h3 id="objective">Objective</h3>
+<p>I want to create a fluid and configurable mobile navigation in <span class="caps">HTML</span>, CSS and JavaScript, that opens and closes from off-screen (off-canvas), and has no&nbsp;dependencies.</p>
+<h3 id="javascript-structure">JavaScript&nbsp;Structure</h3>
+<p>I will delegate the off-canvas navigation functionality to an object constructor <code>Navigation</code>. The constructor will take a single config object that must contain three&nbsp;properties:</p>
+<ul>
+<li><code>parent</code> — the top-level&nbsp;wrapper</li>
+<li><code>main</code> — the main content&nbsp;element</li>
+<li><code>nav</code> — the navigation&nbsp;element</li>
+</ul>
+<p>I also facilitate a <code>getEl</code> helper function to perform scoped querySelector&nbsp;calls.</p>
+<pre><code class="lang-javascript">;(<span class="function"><span class="keyword">function</span> <span class="params">(window, document)</span> {</span>
+<span class="pi">
+  'use strict'</span>;
+
+  <span class="function"><span class="keyword">function</span> <span class="title">getEl</span><span class="params">(obj, parent)</span> {</span>
+    <span class="keyword">return</span> obj &amp;&amp; obj.nodeType ? obj : (parent &amp;&amp; getEl(parent) || document).querySelector(obj);
+  }
+
+  <span class="function"><span class="keyword">function</span> <span class="title">Navigation</span><span class="params">(config)</span> {</span>
+
+    <span class="keyword">if</span> (<span class="string">'object'</span> != <span class="keyword">typeof</span> config)
+      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'Navigation expects first parameter to be configuration object'</span>);
+
+    <span class="keyword">var</span> parent = getEl(config.parent);
+
+    <span class="keyword">if</span> (!parent) {
+      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'Navigation was not supplied with a valid element or selector'</span>);
+    }
+
+    <span class="comment">/**
+     * Navigation#elements contains references to the parent and main/nav subcomponents
+     * @type {Object}
+     */</span>
+    <span class="keyword">this</span>.elements = {
+      parent  : parent,
+      main    : getEl(config.main, parent),
+      nav     : getEl(config.nav, parent)
+    };
+
+    <span class="keyword">if</span> (!<span class="keyword">this</span>.elements.main || !<span class="keyword">this</span>.elements.nav) {
+      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'Navigation instance could not find required subcomponents in parent el'</span>);
+    }
+
+    <span class="comment">/* ... */</span>
+  }
+
+}(window, document));
+</code></pre>
+<h3 id="html-css-structure"><span class="caps">HTML</span>, CSS&nbsp;Structure</h3>
+<p>One must consider exactly <em>what effect</em> the navigation will have on its surroundings in order to optimize <span class="caps">HTML</span> and CSS workflow. Rather than go with a fixed-position, slide-out navigation that obscures the <code>App-main</code> content, I decided to experiment with an effect that simulates the navigation pushing the main content to the right and out of view. The most straightforward way to lay this out in <span class="caps">HTML</span> would be to consolidate a navigation element and a main content element within a single&nbsp;parent.</p>
+<pre><code class="lang-html"><span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"App"</span>&gt;</span>
+  <span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"App-nav"</span>&gt;</span>
+    <span class="comment">&lt;!-- Navigation content --&gt;</span>
+  <span class="tag">&lt;/<span class="title">div</span>&gt;</span>
+  <span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"App-main"</span>&gt;</span>
+    <span class="comment">&lt;!-- Main application content --&gt;</span>
+  <span class="tag">&lt;/<span class="title">div</span>&gt;</span>
+<span class="tag">&lt;/<span class="title">div</span>&gt;</span>
+</code></pre>
+<p>Here I build up the <span class="caps">CSS</span> components, taking particular care to consider scrollbars, positioning, overflow, whitespace and&nbsp;dimensions:</p>
+<pre><code class="lang-css"><span class="tag">html</span>,
+<span class="tag">body</span> <span class="rules">{
+  <span class="comment">/* Stretch to height of viewport */</span>
+  <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">100</span>%</span></span>;
+  <span class="comment">/* Ensure no scrollbars */</span>
+  <span class="rule"><span class="attribute">overflow</span>:<span class="value"> hidden</span></span>;
+  <span class="comment">/* Remove default margins */</span>
+  <span class="rule"><span class="attribute">margin</span>:<span class="value"> <span class="number">0</span></span></span>;
+<span class="rule">}</span></span>
+</code></pre>
+<pre><code class="lang-css"><span class="class">.App</span> <span class="rules">{
+  <span class="comment">/* Ensure no scrollbars */</span>
+  <span class="rule"><span class="attribute">overflow</span>:<span class="value"> hidden</span></span>;
+  <span class="rule"><span class="attribute">position</span>:<span class="value"> relative</span></span>;
+  <span class="rule"><span class="attribute">white-space</span>:<span class="value"> nowrap</span></span>;
+  <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">100</span>%</span></span>;
+<span class="rule">}</span></span>
+
+<span class="class">.App-main</span> <span class="rules">{
+  <span class="rule"><span class="attribute">position</span>:<span class="value"> absolute</span></span>;
+  <span class="rule"><span class="attribute">top</span>:<span class="value"> <span class="number">0</span></span></span>;
+  <span class="rule"><span class="attribute">white-space</span>:<span class="value"> normal</span></span>;
+  <span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">100</span>%</span></span>;
+  <span class="rule"><span class="attribute">z-index</span>:<span class="value"> <span class="number">99</span></span></span>;
+<span class="rule">}</span></span>
+
+<span class="class">.App-nav</span> <span class="rules">{
+  <span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">200</span>px</span></span>;
+  <span class="rule"><span class="attribute">position</span>:<span class="value"> fixed</span></span>;
+  <span class="rule"><span class="attribute">z-index</span>:<span class="value"> <span class="number">1</span></span></span>;
+<span class="rule">}</span></span>
+
+<span class="comment">/**
+ * Ensure both App-main and App-nav stretch to the height of their container
+ * and are <span class="caps">GPU</span>-accelerated
+ */</span>
+<span class="class">.App-main</span>,
+<span class="class">.App-nav</span> <span class="rules">{
+  <span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">100</span>%</span></span>;
+  <span class="rule"><span class="attribute">overflow</span>:<span class="value"> inherit</span></span>;
+  <span class="comment">/* force <span class="caps">GPU</span> acceleration */</span>
+  <span class="rule"><span class="attribute">-webkit-transform</span>:<span class="value"> <span class="function">translateZ(<span class="number">0</span>)</span></span></span>;
+  <span class="rule"><span class="attribute">transform</span>:<span class="value"> <span class="function">translateZ(<span class="number">0</span>)</span></span></span>;
+<span class="rule">}</span></span>
+</code></pre>
+<h3 id="integration">Integration</h3>
+<p>The subcomponents <code>.App-nav</code> and <code>.App-main</code> are isolated under the parent element
+<code>.App</code>. With this in mind, the <code>Navigation</code> constructor function above would be invoked like&nbsp;so:</p>
+<pre><code class="lang-javascript"><span class="keyword">var</span> nav = <span class="keyword">new</span> Navigation({
+  parent  : <span class="string">'.App'</span>,
+  main    : <span class="string">'.App-main'</span>,
+  nav     : <span class="string">'.App-nav'</span>
+});
+</code></pre>
+<h3 id="configuration">Configuration</h3>
+<p>The foundation is now set to decorate the <code>Navigation</code> prototype with some functionality! But first, the constructor needs some additional modification. I will implement two&nbsp;things:</p>
+<ul>
+<li>a <code>config</code> property that contains the configuration (settings) of the&nbsp;navigation</li>
+<li>a <code>state</code> property that contains the state (position) of the&nbsp;navigation</li>
+</ul>
+<pre><code class="lang-javascript"><span class="comment">/* ... */</span>
+
+<span class="function"><span class="keyword">function</span> <span class="title">Navigation</span><span class="params">(config)</span> {</span>
+
+  <span class="comment">/* ... */</span>
+
+  <span class="comment">/**
+   * Navigation#config contains the configuration options of the navigation
+   * @type {Object}
+   */</span>
+  <span class="keyword">this</span>.config = {};
+
+  <span class="keyword">for</span> (<span class="keyword">var</span> prop <span class="keyword">in</span> defaultConfig) {
+    <span class="keyword">this</span>.config[prop] = config[prop] || defaultConfig[prop];
+  }
+
+  <span class="comment">/**
+   * Navigation#state contains information about the current state of the navigation
+   * @type {Object}
+   */</span>
+  <span class="keyword">this</span>.state = {
+    open          : <span class="literal">false</span>,
+    time          : <span class="number">0</span>,    <span class="comment">// Date at last touchmove event</span>
+    x             : <span class="number">0</span>,    <span class="comment">// x position of last touchmove event</span>
+    defaultOpen   : <span class="literal">null</span>  <span class="comment">// Show/hide navigation on next touchend (bool)</span>
+  };
+
+  <span class="comment">/* ... */</span>
+</code></pre>
+<p>Running this code would result in a ReferenceError as <code>defaultConfig</code> has yet to be defined. Here is my proposed list of configuration options for <code>Navigation</code>:</p>
+<ul>
+<li><code>easingDuration</code> — Duration of open/close&nbsp;transition</li>
+<li><code>timingFunction</code> — <span class="caps">CSS</span> timing function property of open/close&nbsp;transition</li>
+<li><code>navStartDistance</code> — Navigation subcomponent start&nbsp;position</li>
+<li><code>mainPushDistance</code> — Max travel distance of navigation&nbsp;subcomponent</li>
+<li><code>handleWidth</code> — Width of handle (I will go over this&nbsp;soon)</li>
+<li><code>flickThreshold</code> — Drag velocity multiplier to open/close&nbsp;navigation</li>
+<li><code>openThreshold</code> — % of mainPushDistance that will default&nbsp;open/close</li>
+</ul>
+<p>and an example <code>defaultConfig</code>:</p>
+<pre><code class="lang-javascript"><span class="keyword">var</span> defaultConfig = {
+  easingDuration    : <span class="number">200</span>,
+  timingFunction    : <span class="string">'ease-out'</span>,
+  navStartDistance  : <span class="string">'-200px'</span>,
+  mainPushDistance  : <span class="string">'200px'</span>,
+  handleWidth       : <span class="string">'8%'</span>,
+  flickThreshold    : <span class="number">1.4</span>,
+  openThreshold     : <span class="number">0.5</span>
+};
+</code></pre>
+<h3 id="orientation">Orientation</h3>
+<p>Since a mobile device can change orientation, we need to have a running reference to the width of the device that can update when the parent resizes or switches from portrait to landscape and vice-versa. This width will help us calculate pixel values for <code>navStartDistance</code> and <code>mainPushDistance</code> if they are passed as&nbsp;percentages.</p>
+<p>Here I add the first method to the <code>Navigation</code> prototype:</p>
+<pre><code class="lang-javascript">Navigation.prototype.updateParentWidth = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  <span class="keyword">var</span> parent = <span class="keyword">this</span>.elements.parent;
+  <span class="keyword">this</span>.parentWidth = parent.innerWidth || parent.clientWidth;
+};
+</code></pre>
+<p><code>Navigation#updateParentWidth</code> is then executed inside of the constructor function, along with an event listener that will be responsible for updating <code>this.parentWidth</code> when the viewport changes orientation or&nbsp;resizes:</p>
+<pre><code class="lang-javascript"><span class="comment">/* ... */</span>
+
+<span class="function"><span class="keyword">function</span> <span class="title">Navigation</span><span class="params">(config)</span> {</span>
+  <span class="comment">/* ... */</span>
+
+  <span class="keyword">this</span>.insertHandle(<span class="keyword">this</span>.elements.main);
+  window.addEventListener(
+    <span class="string">'onorientationchange'</span> <span class="keyword">in</span> window ? <span class="string">'orientationchange'</span> : <span class="string">'resize'</span>,
+    <span class="keyword">this</span>.updateParentWidth.bind(<span class="keyword">this</span>)
+  );
+}
+</code></pre>
+<p>Notice the fallback to <code>&#39;resize&#39;</code> for browsers that lack the <code>&#39;orientationchange&#39;</code> event.</p>
+<h3 id="core-methods">Core&nbsp;Methods</h3>
+<p>Before diving in to complexities of touch events, I will decorate the Navigation prototype with some basic&nbsp;functionality.</p>
+<ul>
+<li><code>Navigation#open</code> — open the navigation, shifting <code>this.elements.main</code> a pixel value/percentage of the viewport’s width to the right (<code>this.config.mainPushDistance</code>), and <code>this.elements.nav</code> to that distance from it’s starting X position (<code>this.config.navStartDistance</code>).<ul>
+<li>add an event listener to the <code>document</code> for the <code>backbutton</code> event which fires in a Cordova environment when the user presses the Android back&nbsp;button,</li>
+<li>set the <code>this.state.open</code> property to <code>true</code></li>
+</ul>
+</li>
+<li><code>Navigation#close</code> — move the <code>this.elements.nav</code> and <code>this.elements.main</code> elements back to their starting place,<ul>
+<li>remove the <code>backbutton</code> event&nbsp;listener,</li>
+<li>set <code>this.state.open</code> to&nbsp;false</li>
+</ul>
+</li>
+<li><code>Navigation#ease</code> — manually apply a transition property to the <code>this.elements.main</code> and <code>this.elements.nav</code> elements for a duration set by the config <code>this.config.easingDuration</code>. One could find use in dividing this up into separate functions for each subcomponent to achieve a desired open/closing&nbsp;effect</li>
+</ul>
+<pre><code class="lang-javascript"><span class="comment">/* ... */</span>
+
+Navigation.prototype.open = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  <span class="keyword">var</span> mainPushTranslate = <span class="string">'translateX('</span> + <span class="keyword">this</span>.config.mainPushDistance + <span class="string">')'</span>,
+      navOpenTranslate = <span class="string">'translateX(0)'</span>,
+      mainStyle = <span class="keyword">this</span>.elements.main.style,
+      navStyle = <span class="keyword">this</span>.elements.nav.style;
+
+  <span class="keyword">this</span>.ease();
+
+  document.addEventListener(<span class="string">'backbutton'</span>, <span class="keyword">this</span>.onBackButton, <span class="literal">false</span>);
+
+  mainStyle.transform        = mainPushTranslate;
+  mainStyle.webkitTransform  = mainPushTranslate;
+  navStyle.transform         = navOpenTranslate;
+  navStyle.webkitTransform   = navOpenTranslate;
+
+  <span class="keyword">this</span>.state.open = <span class="literal">true</span>;
+};
+
+Navigation.prototype.close = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  <span class="keyword">var</span> mainStartTranslate = <span class="string">'translateX(0)'</span>,
+      navStartTranslate = <span class="string">'translateX('</span> + <span class="keyword">this</span>.config.navStartDistance + <span class="string">')'</span>,
+      mainStyle = <span class="keyword">this</span>.elements.main.style,
+      navStyle = <span class="keyword">this</span>.elements.nav.style;
+
+  <span class="keyword">this</span>.ease();
+
+  document.removeEventListener(<span class="string">'backbutton'</span>, <span class="keyword">this</span>.onBackButton, <span class="literal">false</span>);
+
+  mainStyle.transform        = mainStartTranslate;
+  mainStyle.webkitTransform  = mainStartTranslate;
+  navStyle.transform         = navStartTranslate;
+  navStyle.webkitTransform   = navStartTranslate;
+
+  <span class="keyword">this</span>.state.open = <span class="literal">false</span>;
+};
+
+Navigation.prototype.ease = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  <span class="keyword">var</span> easingDuration = <span class="keyword">this</span>.config.easingDuration,
+      timing = <span class="keyword">this</span>.config.timingFunction + <span class="string">' all '</span> + easingDuration + <span class="string">'ms'</span>,
+      mainStyle = <span class="keyword">this</span>.elements.main.style,
+      navStyle = <span class="keyword">this</span>.elements.nav.style;
+
+  mainStyle.transition       = timing;
+  mainStyle.webkitTransition = timing;
+  navStyle.transition        = timing;
+  navStyle.webkitTransition  = timing;
+
+  setTimeout(<span class="function"><span class="keyword">function</span><span class="params">()</span> {</span>
+    mainStyle.transition       = <span class="literal">null</span>;
+    mainStyle.webkitTransition = <span class="literal">null</span>;
+    navStyle.transition        = <span class="literal">null</span>;
+    navStyle.webkitTransition  = <span class="literal">null</span>;
+  }, easingDuration);
+};
+
+Navigation.prototype.onBackButton = <span class="function"><span class="keyword">function</span> <span class="params">(e)</span> {</span>
+  e.preventDefault();
+  <span class="keyword">this</span>.close();
+};
+</code></pre>
+<p><code>Navigation#close</code> is then executed inside of the constructor&nbsp;function:</p>
+<pre><code class="lang-javascript"><span class="comment">/* ... */</span>
+
+<span class="function"><span class="keyword">function</span> <span class="title">Navigation</span><span class="params">(config)</span> {</span>
+  <span class="comment">/* ... */</span>
+
+  <span class="keyword">this</span>.close();
+}
+</code></pre>
+<p>Instead of handling the states of open and closed with manual modification of the elements’ style attributes, one could just as easily use a <span class="caps">CSS</span> class such as <code>is-open</code> to the <code>App</code> element that modifies the <code>translateX</code> of both subcomponents. This could make the JavaScript a lot cleaner and would move more configuration of the navigation into the&nbsp;<span class="caps">CSS</span>.</p>
+<h3 id="touch-interface">Touch&nbsp;Interface</h3>
+<p>At this point, the navigation can open, close, and respond to the Android <code>backbutton</code> event in Cordova, but it is yet to have any response to touch events. Touch integration requires one to imagine what is probably the most important piece of the puzzle: the interface that bridges the gap between the user and control of the&nbsp;navigation.</p>
+<p>Assuming the navigation opens and closes from the left hand side of the application, the most obvious choice for this touch area would be the first 8-15% of the left side of <code>this.elements.main</code>. As it turns out, calculating this area every time the navigation moves as well as every time the orientation changes can get a little sloppy, so I decided to facilitate a <strong>handle</strong> element. This element would be a child of <code>this.elements.main</code> and exposes the DOMElement <span class="caps">API</span> for us to attach event handlers to&nbsp;it.</p>
+<pre><code class="lang-javascript"><span class="comment">/* ... */</span>
+
+Navigation.prototype.insertHandle = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  <span class="comment">// Remove any pre-existing handle</span>
+  <span class="keyword">if</span> (<span class="keyword">this</span>.handle) {
+    <span class="keyword">this</span>.el.main.removeChild(<span class="keyword">this</span>.handle);
+  }
+
+  <span class="comment">// Create/configure handle element</span>
+  <span class="keyword">var</span> handle = document.createElement(<span class="string">'div'</span>);
+  handle.style.position = <span class="string">'absolute'</span>;
+  handle.style.top = <span class="string">'0'</span>;
+  handle.style.width = <span class="keyword">this</span>.config.handleWidth;
+  handle.style.height = <span class="string">'100%'</span>;
+
+  <span class="keyword">this</span>.handle = handle;
+
+  <span class="comment">/**
+   * this.handle now provides access to all of the DOMElement <span class="caps">API</span> goodies
+   * like event listeners:
+   */</span>
+
+  handle.addEventListener(<span class="string">'touchstart'</span>, <span class="keyword">this</span>.onTouchStart.bind(<span class="keyword">this</span>));
+  handle.addEventListener(<span class="string">'touchmove'</span>, <span class="keyword">this</span>.onTouchMove.bind(<span class="keyword">this</span>));
+  handle.addEventListener(<span class="string">'touchend'</span>, <span class="keyword">this</span>.onTouchEnd.bind(<span class="keyword">this</span>));
+
+  <span class="comment">// Ignore touchcancel completely (broken on Android)</span>
+  handle.addEventListener(<span class="string">'touchcancel'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(e)</span> {</span>
+    e.preventDefault();
+  });
+
+  <span class="keyword">this</span>.elements.main.appendChild(handle);
+};
+</code></pre>
+<p><code>Navigation#insertHandle</code> is then executed inside of the constructor&nbsp;function:</p>
+<pre><code class="lang-javascript"><span class="comment">/* ... */</span>
+
+<span class="function"><span class="keyword">function</span> <span class="title">Navigation</span><span class="params">(config)</span> {</span>
+  <span class="comment">/* ... */</span>
+
+  <span class="keyword">this</span>.insertHandle(<span class="keyword">this</span>.elements.main);
+}
+</code></pre>
+<p>Notice that I am using the <code>bind()</code> method on each of the event handlers to maintain <code>this</code> context.</p>
+<p>A considerable issue with this solution is that any elements beneath the handle element will be obscured by it. This means that the application essentially loses 8-15% of space for buttons, inputs and any other interactive elements to be&nbsp;utilized.</p>
+<p>Executing <code>this.insertHandle()</code> at this point should yield a <code>TypeError</code> because neither of the event handlers (<code>this.onTouchMove</code>, <code>this.onTouchEnd</code>) have been&nbsp;defined.</p>
+<p>Onward! I will use a few properties from the state object set up in the <code>Navigation</code> constructor to make some important&nbsp;calculations:</p>
+<ul>
+<li><code>this.state.time</code> and <code>this.state.x</code> to help us determine the velocity of the user dragging the&nbsp;handle,</li>
+<li><code>this.state.defaultOpen</code> to determine if the nav should close/open on the next <code>touchend</code> event on the&nbsp;handle</li>
+</ul>
+<p>I will also introduce a new method to the <code>Navigation</code> prototype, <code>getMainPushDistance</code>, that will calculate the the maximum distance <code>this.elements.navigation</code> and <code>this.elements.main</code> can move from a % or px&nbsp;value.</p>
+<pre><code class="lang-javascript"><span class="comment">/* ... */</span>
+
+Navigation.prototype.getMainPushDistance = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  <span class="keyword">var</span> mainPushDistance = <span class="keyword">this</span>.config.mainPushDistance;
+  <span class="keyword">return</span> mainPushDistance.indexOf(<span class="string">'%'</span>) &gt; -<span class="number">1</span> ?
+    <span class="built_in">parseInt</span>(mainPushDistance) / <span class="number">100</span> * <span class="keyword">this</span>.parentWidth :
+    <span class="built_in">parseInt</span>(mainPushDistance);
+};
+
+Navigation.prototype.onTouchMove = <span class="function"><span class="keyword">function</span> <span class="params">(e)</span> {</span>
+  e.preventDefault();
+  <span class="comment">// Create a new date to get current time</span>
+  <span class="keyword">var</span> currentTime = <span class="keyword">new</span> <span class="built_in">Date</span>(),
+      <span class="comment">// Get touch information</span>
+      touches = e.touches,
+      <span class="comment">// Get the current rectangle of the main element</span>
+      rect = <span class="keyword">this</span>.elements.main.getBoundingClientRect(),
+      <span class="comment">// Get the X position of the touch</span>
+      touchX = touches[<span class="number">0</span>].pageX,
+      <span class="comment">// Determine the distance from the last touch event</span>
+      delta = <span class="keyword">this</span>.state.x - touchX,
+      <span class="comment">// Calculate the absolute value to determine direction</span>
+      absolute = <span class="built_in">Math</span>.abs(delta),
+      <span class="comment">// Calculate the velocity of drag</span>
+      velocity = absolute / (currentTime - <span class="keyword">this</span>.state.time),
+      mainPushDistance = <span class="keyword">this</span>.getMainPushDistance();
+
+  <span class="comment">// If the drag surpassed the this.config.flickThreshold value,</span>
+  <span class="comment">// on next touchend:</span>
+  <span class="comment">//    open the nav if the delta was negative (direction left)</span>
+  <span class="comment">//    hide the nav if the delta was positive (direction right)</span>
+  <span class="comment">//    hide the nav if the delta was 0</span>
+  <span class="keyword">if</span> (velocity &gt; <span class="keyword">this</span>.config.flickThreshold) {
+    <span class="keyword">this</span>.state.defaultOpen = !~(delta &amp;&amp; delta / absolute) ? <span class="literal">true</span> : <span class="literal">false</span>;
+  }
+
+  <span class="comment">// Update state properties</span>
+  <span class="keyword">this</span>.state.x = touchX;
+  <span class="keyword">this</span>.state.time = currentTime;
+
+  <span class="keyword">if</span> (
+    <span class="comment">// Ensure the subcomponents do not move beyond the max distance</span>
+    touchX &lt; mainPushDistance &amp;&amp;
+    <span class="comment">// Not sure why touchX would be &lt; 0 but what the hell</span>
+    touchX &gt; <span class="number">0</span>
+  ) {
+    <span class="comment">// Move the App-main element</span>
+    <span class="keyword">this</span>.elements.main.style.webkitTransform = <span class="string">'translate3d('</span> + touchX + <span class="string">'px, 0, 0)'</span>;
+    <span class="comment">// Move the Nav element</span>
+    <span class="keyword">this</span>.elements.nav.style.webkitTransform = <span class="string">'translate3d('</span> + -<span class="keyword">this</span>.parentWidth / touchX + <span class="string">'px, 0, 0)'</span>;
+  }
+};
+
+Navigation.prototype.onTouchEnd = <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  <span class="comment">// Get the current rectangle of the main element</span>
+  <span class="keyword">var</span> rect = <span class="keyword">this</span>.elements.main.getBoundingClientRect(),
+      openThreshold = <span class="keyword">this</span>.config.openThreshold,
+      mainPushDistance = <span class="keyword">this</span>.getMainPushDistance(),
+      method;
+
+  <span class="keyword">if</span> (<span class="keyword">this</span>.state.defaultOpen === <span class="literal">true</span>) {
+    <span class="comment">// Default to the open state</span>
+    <span class="keyword">this</span>.open();
+  } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">this</span>.state.defaultOpen === <span class="literal">false</span>) {
+    <span class="comment">// Default to the closed state</span>
+    <span class="keyword">this</span>.close();
+  } <span class="keyword">else</span> {
+    <span class="comment">// Determine state based on `openThreshold`</span>
+    method = <span class="keyword">this</span>.state.open ?
+      rect.left &lt; (<span class="number">1</span> - openThreshold) * mainPushDistance ? <span class="string">'close'</span> : <span class="string">'open'</span>:
+      rect.left &gt; openThreshold * mainPushDistance ? <span class="string">'open'</span> : <span class="string">'close'</span>;
+    <span class="keyword">this</span>[method]();
+  }
+
+  <span class="keyword">this</span>.state.defaultOpen = <span class="literal">null</span>;
+};
+</code></pre>
+<p>A demo for all of the code in this article is located at <a href="/articles/hybrid-touch-nav/demo/">http://ericmcd.com/articles/hybrid-touch-nav/demo/</a>. Try going to the <span class="caps">URL</span> in a mobile browser or emulator to see the mobile navigation in&nbsp;action.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>The biggest drawback of this approach is the loss of interactive screen space due to the handle element. Perhaps a better idea would be to calculate velocity of touchmove events on <code>this.elements.main</code> rather than a handle, or any particular percentage of <code>this.elements.main</code> itself.</p>
+</section>
+          </article>
+        </div>
+        <div class="Box Box--transparent"><span class="copy">copyright &copy; 2014 Eric McDaniel</span></div>
+      </main>
+    </div>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-47442359-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </body>
+</html>

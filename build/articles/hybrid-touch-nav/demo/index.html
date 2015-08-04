@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Touch enabled mobile navigation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="App">
+    <div class="App-nav">
+      <div class="Content">
+        <h2>Navigation</h2>
+      </div>
+    </div>
+    <div class="App-main">
+      <div class="Content">
+        <p>Touch and drag from the left hand side of the screen to open the mobile navigation.</p>
+      </div>
+    </div>
+  </div>
+  <script src="navigation.js"></script>
+  <script>
+  var nav = new Navigation({
+    parent  : '.App',
+    main    : '.App-main',
+    nav     : '.App-nav'
+  });
+  </script>
+</body>
+</html>

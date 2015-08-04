@@ -1,0 +1,30 @@
+extends layout
+
+block header
+  div.Header.Header--bordered
+    div.Box.Box--transparent
+      span.Header-heading
+        each result, i in locals.name.split(' ')
+          h1= result
+    div.Box.Box--transparent
+      span.Header-info Words on topics I'm passionate about, including web development and JavaScript.
+    div.Box.Links
+      a.Links-social(href=locals.github, target='_blank', title='GitHub')= 'Q'
+      a.Links-social(href=locals.twitter, target='_blank', title='Twitter')= 'a'
+      a.Links-social(href='mailto:' + locals.email, title='Email')= '@'
+      a.Links-social(href='/feed.xml')= ','
+
+block content
+  include author
+  each article in articles
+    div.Box.Box--transparent
+      article.Article
+        header.Article-header
+          h2
+            a(href=article.url)= article.title
+        section.Article-body
+          | !{article.intro}
+        div.Article-date
+          span.Date= moment.utc(article.date).format('DD MMMM YYYY')
+  div.copy
+    | &copy; 2015 Eric McDaniel

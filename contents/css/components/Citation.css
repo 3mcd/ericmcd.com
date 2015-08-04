@@ -1,0 +1,25 @@
+/** @define Box; use-strict */
+
+.Citation {
+  transition: all ease-out 50ms;
+  padding: 1px;
+}
+
+.Citation > sup {
+  font-size: 0.6em;
+}
+
+.Citation > sup:before {
+  content: '[';
+}
+
+.Citation > sup:after {
+  content: ']';
+}
+
+.Citation.is-active {
+  color: #fff;
+  background-color: #3DA3AD;
+  border: 0;
+  transition: all ease-out 50ms;
+}
