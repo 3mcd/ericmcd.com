@@ -2,7 +2,7 @@
 
 .Header {
   position: relative;
-  transition: all cubic-bezier(.49,.51,.56,.96 ) 350ms;
+  transition: all cubic-bezier(.49,.51,.56,.96 ) 400ms;
   width: 100%;
 }
 
