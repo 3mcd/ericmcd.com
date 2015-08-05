@@ -2,7 +2,6 @@
 
 .Header {
   position: relative;
-  transition: all cubic-bezier(.49,.51,.56,.96 ) 400ms;
   width: 100%;
 }
 
@@ -22,7 +21,7 @@
 }
 
 .Header-info {
-  font-size: 0.8em;
+  font-size: 90%;
 }
 
 .Header-info > a:after {

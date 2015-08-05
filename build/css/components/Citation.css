@@ -1,7 +1,6 @@
 /** @define Box; use-strict */
 
 .Citation {
-  transition: all ease-out 50ms;
   padding: 1px;
 }
 
@@ -19,7 +18,7 @@
 
 .Citation.is-active {
   color: #fff;
-  background-color: #3DA3AD;
+  background-color: #5F5E6E;
   border: 0;
   transition: all ease-out 50ms;
 }
