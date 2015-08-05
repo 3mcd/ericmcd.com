@@ -5,10 +5,6 @@
   width: 100%;
 }
 
-.Header--bordered {
-  border-right: 2px solid #fdfdfd;
-}
-
 .Header-heading,
 .Header-heading * {
   margin: 0;
@@ -38,6 +34,5 @@
 @media (max-width: 690px) {
   .Header {
     position: static;
-    border: none;
   }
 }

@@ -11,7 +11,12 @@
   opacity: 1;
 }
 
+.References > a {
+  display: table-row;
+}
+
 .References > a:after {
   content: '\A';
+  height: 0px;
   white-space: pre;
 }
