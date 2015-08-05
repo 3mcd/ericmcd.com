@@ -1,23 +1,19 @@
 /** @define Blog; use-strict */
 
 .Blog {
-  display: table;
-  table-layout: fixed;
-  border-collapse: separate;
   padding: 1em;
   max-width: 950px;
   margin: 0 auto;
 }
 
 .Blog-header {
-  display: table-cell;
-  position: relative;
-  min-width: 16em;
+  position: fixed;
+  width: 16em;
 }
 
 .Blog-content {
+  padding-left: 16em;
   padding-top: 1em;
-  display: table-cell;
   vertical-align: top;
   width: 100%;
 }
@@ -32,7 +28,9 @@
   .Blog,
   .Blog-header,
   .Blog-content {
-    display: block;
+    position: static;
+    width: 100%;
+    padding: 0;
   }
 }
 

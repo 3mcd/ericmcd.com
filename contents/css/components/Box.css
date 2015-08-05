@@ -18,3 +18,7 @@
 .Box--thin {
   padding: 0;
 }
+
+.Box--snap {
+  margin: 0;
+}

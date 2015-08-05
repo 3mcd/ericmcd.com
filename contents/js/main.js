@@ -4,46 +4,11 @@ import $ from 'jquery/dist/jquery.min';
 const $blog = $('.Blog');
 const $refs = $('.Article-body a[title]');
 const $header = $('.Header');
-const $headerInfo = $header.find('.Header-info');
+const $refContainer = $header.find('.References');
 
 const headerTransition = $header.css('transition');
 
 const refs = Array.prototype.slice.call($refs);
-
-const scrolls = Rx.Observable.fromEvent(document, 'scroll')
-  .map(
-    (e) => $blog.scrollTop()
-  )
-  .distinctUntilChanged().startWith(0, 0);
-
-const diff = scrolls.bufferWithCount(2, 1);
-
-const smooth = diff
-  .where(
-    (pos) => Math.abs(pos[0] - pos[1]) < 40
-  );
-
-const coarse = diff
-  .where(
-    (pos) => Math.abs(pos[0] - pos[1]) >= 40
-  )
-  .debounce(175);
-
-smooth.subscribe(
-  () => $header.css('top', $blog.scrollTop() + 'px')
-);
-
-var timeout;
-
-coarse.subscribe(
-  (top) => {
-    $header
-      .css('top', $blog.scrollTop() + 'px');
-
-    if (!timeout)
-      timeout = setTimeout(() => $header.css('transition', headerTransition))
-  }
-);
 
 const $headerRefs = refs.reduce(
   (a, el) => a.add($('<a/>', {
@@ -54,7 +19,7 @@ const $headerRefs = refs.reduce(
     $([])
 );
 
-$headerInfo.append($headerRefs);
+$refContainer.append($headerRefs);
 
 [$refs, $headerRefs].forEach(
   (list) => list.each(
@@ -65,6 +30,8 @@ $headerInfo.append($headerRefs);
 const $allRefs = $refs.add($headerRefs);
 
 $allRefs.addClass('Citation').attr('target', '_blank');
+
+$refContainer.addClass('is-active');
 
 const allRefsMouseover = Rx.Observable.fromEvent($allRefs, 'mouseover');
 

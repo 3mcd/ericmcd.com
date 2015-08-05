@@ -10,7 +10,7 @@ html(lang='en')
       title
         block title
           = locals.name + " - " + locals.description
-          
+
       link( rel="apple-touch-icon" sizes="57x57" href="/img/apple-icon-57x57.png")
       link( rel="apple-touch-icon" sizes="60x60" href="/img/apple-icon-60x60.png")
       link( rel="apple-touch-icon" sizes="72x72" href="/img/apple-icon-72x72.png")
@@ -42,3 +42,4 @@ html(lang='en')
       | ga('create', 'UA-47442359-1', 'auto');
       | ga('send', 'pageview');
     script(src='/js/main.js', type='text/javascript')
+    block scripts
