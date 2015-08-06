@@ -4,7 +4,7 @@ author: eric
 date: 2014-11-20 7:30
 template: article.jade
 ---
-Sort and order an API resource by relationship in Laravel's object relational mapper.
+Sort and order an API resource by relationship in Laravel's object relational mapper
 <span class="more"></span>
 
 I decided to build an API in [Laravel](http://laravel.com/ "Laravel Website") as the backend for my team's time tracking application. Laravel has all of the necessary tools to build full-scale applications, and I used it for it's superb router, controllers, query builder and object relational mapper (dubbed [Eloquent](http://laravel.com/docs/4.2/eloquent "Eloquent Docs")).
