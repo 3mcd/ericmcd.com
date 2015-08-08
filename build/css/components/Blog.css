@@ -2,21 +2,21 @@
 
 .Blog {
   padding: 1em;
-  max-width: 950px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
 .Blog-header {
   position: fixed;
-  width: 16em;
+  width: 14em;
 }
 
 .Blog-content {
-  padding-left: 16em;
+  padding-left: 14em;
   padding-top: 1em;
   vertical-align: top;
   display: block;
-  width: 100%;
+  max-width: 100%;
 }
 
 @media (max-width: 1024px) {

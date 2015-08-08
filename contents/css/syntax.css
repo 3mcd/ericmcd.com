@@ -37,13 +37,13 @@ pre {
 }
 
 code {
-  color: #666;
+  color: #5F5E6E;
   font-family: PragmataPro, Menlo, Consolas, monospace;
   font-size: 0.9em;
 }
 
 pre code {
-  background-color: #fdfdfd;
+  background-color: #fff;
   color: #5F5E6E;
   font-size: 0.75em;
   display: block;

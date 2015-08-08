@@ -26,6 +26,6 @@ block content
         div.Article-body.is-active
           | !{article.intro}
         div.Article-date
-          span.Date= 'Posted on ' + moment.utc(article.date).format('DD MMMM YYYY')
+          span.Date= moment.utc(article.date).format('DD MMMM YYYY')
   div.copy
     | &copy; 2015 Eric McDaniel
