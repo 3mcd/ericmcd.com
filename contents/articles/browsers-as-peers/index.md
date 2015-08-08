@@ -100,7 +100,7 @@ these servers out of the box, but it does provide an easy way to integrate them
 into your application.
 
 PeerJS does, however, trivialize the aformentioned signaling problem with
-[PeerServer](https://github.com/peers/peerjs-server "PeerServer repository"):
+[PeerServer](https://github.com/peers/peerjs-server "PeerServer GitHub repo"):
 a Node-based, open source implementation of a signaling server. The
 package ships with middleware for Express making it simple to integrate into a
 pre-existing application. Setting up the server is demonstrated well at the

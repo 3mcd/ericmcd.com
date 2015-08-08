@@ -101,7 +101,7 @@ infrastructure can be found in this excellent &lt;a href=&quot;http://www.html5r
 these servers out of the box, but it does provide an easy way to integrate them
 into your application.&lt;/p&gt;
 &lt;p&gt;PeerJS does, however, trivialize the aformentioned signaling problem with
-&lt;a href=&quot;https://github.com/peers/peerjs-server&quot; title=&quot;PeerServer repository&quot;&gt;PeerServer&lt;/a&gt;:
+&lt;a href=&quot;https://github.com/peers/peerjs-server&quot; title=&quot;PeerServer GitHub repo&quot;&gt;PeerServer&lt;/a&gt;:
 a Node-based, open source implementation of a signaling server. The
 package ships with middleware for Express making it simple to integrate into a
 pre-existing application. Setting up the server is demonstrated well at the
