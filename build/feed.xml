@@ -24,8 +24,8 @@ centralized model like Facebook Chat, where messages pass through Facebook’s
 server(s).&lt;/p&gt;
 &lt;p&gt;In my opinion, the two most notable benefits of P2P are:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;Lower latency and increased reliability due to lack of a central server.&lt;/li&gt;
-&lt;li&gt;Data is guaranteed to stay out of the hands of the service (like Facebook).&lt;/li&gt;
+&lt;li&gt;Lower latency and increased reliability (no central point of failure).&lt;/li&gt;
+&lt;li&gt;Privacy due to lack of a central server.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3 id=&quot;p2p-in-the-browser&quot;&gt;P2P in the browser&lt;/h3&gt;
 &lt;p&gt;Since P2P results in more rapid, reliable and secure transfer of data, it’s a
@@ -41,10 +41,9 @@ PeerJS provides is a welcome change from manipulating &lt;code&gt;RTCPeerConnect
 &lt;code&gt;getUserMedia&lt;/code&gt;, etc. yourself.&lt;/p&gt;
 &lt;p&gt;Here’s a code example of a simple PeerJS app:&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;lang-javascript&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;import&lt;/span&gt; Peer &lt;span class=&quot;keyword&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'peerjs'&lt;/span&gt;;
-&lt;span class=&quot;keyword&quot;&gt;import&lt;/span&gt; {peerKey} &lt;span class=&quot;keyword&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'config/keys'&lt;/span&gt;;
 
 &lt;span class=&quot;comment&quot;&gt;// Establish a connection to the PeerServer with our API key&lt;/span&gt;
-&lt;span class=&quot;keyword&quot;&gt;const&lt;/span&gt; peer = &lt;span class=&quot;keyword&quot;&gt;new&lt;/span&gt; Peer({ key: peerKey });
+&lt;span class=&quot;keyword&quot;&gt;const&lt;/span&gt; peer = &lt;span class=&quot;keyword&quot;&gt;new&lt;/span&gt; Peer({ key: &lt;span class=&quot;string&quot;&gt;'xxxxxx'&lt;/span&gt; });
 
 &lt;span class=&quot;comment&quot;&gt;// Create an array of DataConnection objects&lt;/span&gt;
 &lt;span class=&quot;keyword&quot;&gt;const&lt;/span&gt; connections = [];
@@ -119,11 +118,10 @@ Skype clones?&lt;/p&gt;
 &lt;p&gt;I tend to envision wacky application ideas during my commute. What else would
 I be doing in gridlock traffic? I imagined a sort-of live blogging platform,
 where users configure “containers” to share data in real time with other peers
-in the form of audio, video, streams and messages. Peers could subsequently
+in the form of audio, video, files and messages. Peers could subsequently
 share those streams of information to their network of peers by acting as a
 proxy. It would be kind of like a real-time, ephemeral Facebook. All in the
-browser!&lt;/p&gt;
-&lt;p&gt;Then I got honked at.&lt;/p&gt;
+browser! Then I got honked at.&lt;/p&gt;
 &lt;p&gt;In any case, I think we’ll be seeing a lot of WebRTC in the near future.&lt;/p&gt;
 &lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.min.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
 &lt;script src=&quot;main.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;

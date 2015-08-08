@@ -60,8 +60,8 @@ P2P communication is considered a decentralized model, as opposed to a
 centralized model like Facebook Chat, where messages pass through Facebook’s&nbsp;server(s).</p>
 <p>In my opinion, the two most notable benefits of <span class="caps">P2P</span>&nbsp;are:</p>
 <ul>
-<li>Lower latency and increased reliability due to lack of a central&nbsp;server.</li>
-<li>Data is guaranteed to stay out of the hands of the service (like&nbsp;Facebook).</li>
+<li>Lower latency and increased reliability (no central point of&nbsp;failure).</li>
+<li>Privacy due to lack of a central&nbsp;server.</li>
 </ul>
 <h3 id="p2p-in-the-browser"><span class="caps">P2P</span> in the&nbsp;browser</h3>
 <p>Since <span class="caps">P2P</span> results in more rapid, reliable and secure transfer of data, it’s a
@@ -77,10 +77,9 @@ PeerJS provides is a welcome change from manipulating <code>RTCPeerConnection</c
 <code>getUserMedia</code>, etc.&nbsp;yourself.</p>
 <p>Here’s a code example of a simple PeerJS&nbsp;app:</p>
 <pre><code class="lang-javascript"><span class="keyword">import</span> Peer <span class="keyword">from</span> <span class="string">'peerjs'</span>;
-<span class="keyword">import</span> {peerKey} <span class="keyword">from</span> <span class="string">'config/keys'</span>;
 
 <span class="comment">// Establish a connection to the PeerServer with our <span class="caps">API</span> key</span>
-<span class="keyword">const</span> peer = <span class="keyword">new</span> Peer({ key: peerKey });
+<span class="keyword">const</span> peer = <span class="keyword">new</span> Peer({ key: <span class="string">'xxxxxx'</span> });
 
 <span class="comment">// Create an array of DataConnection objects</span>
 <span class="keyword">const</span> connections = [];
@@ -155,10 +154,10 @@ Skype&nbsp;clones?</p>
 <p>I tend to envision wacky application ideas during my commute. What else would
 I be doing in gridlock traffic? I imagined a sort-of live blogging platform,
 where users configure “containers” to share data in real time with other peers
-in the form of audio, video, streams and messages. Peers could subsequently
+in the form of audio, video, files and messages. Peers could subsequently
 share those streams of information to their network of peers by acting as a
-proxy. It would be kind of like a real-time, ephemeral Facebook. All in the&nbsp;browser!</p>
-<p>Then I got honked&nbsp;at.</p>
+proxy. It would be kind of like a real-time, ephemeral Facebook. All in the
+browser! Then I got honked&nbsp;at.</p>
 <p>In any case, I think we’ll be seeing a lot of WebRTC in the near&nbsp;future.</p>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.min.js" type="text/javascript"></script>
 <script src="main.js" type="text/javascript"></script>

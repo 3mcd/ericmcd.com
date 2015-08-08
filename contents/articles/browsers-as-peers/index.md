@@ -15,8 +15,8 @@ centralized model like Facebook Chat, where messages pass through Facebook's
 server(s).
 
 In my opinion, the two most notable benefits of P2P are:
-- Lower latency and increased reliability due to lack of a central server.
-- Data is guaranteed to stay out of the hands of the service (like Facebook).
+- Lower latency and increased reliability (no central point of failure).
+- Privacy due to lack of a central server.
 
 ### P2P in the browser
 
@@ -37,10 +37,9 @@ Here's a code example of a simple PeerJS app:
 
 ```javascript
 import Peer from 'peerjs';
-import {peerKey} from 'config/keys';
 
 // Establish a connection to the PeerServer with our API key
-const peer = new Peer({ key: peerKey });
+const peer = new Peer({ key: 'xxxxxx' });
 
 // Create an array of DataConnection objects
 const connections = [];
@@ -121,12 +120,10 @@ Skype clones?
 I tend to envision wacky application ideas during my commute. What else would
 I be doing in gridlock traffic? I imagined a sort-of live blogging platform,
 where users configure "containers" to share data in real time with other peers
-in the form of audio, video, streams and messages. Peers could subsequently
+in the form of audio, video, files and messages. Peers could subsequently
 share those streams of information to their network of peers by acting as a
 proxy. It would be kind of like a real-time, ephemeral Facebook. All in the
-browser!
-
-Then I got honked at.
+browser! Then I got honked at.
 
 In any case, I think we'll be seeing a lot of WebRTC in the near future.
 
