@@ -25,7 +25,7 @@ server(s).&lt;/p&gt;
 &lt;p&gt;In my opinion, the two most notable benefits of P2P are:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Lower latency and increased reliability due to lack of a central server.&lt;/li&gt;
-&lt;li&gt;Data is guaranteed to stay out of the hands of the service provider.&lt;/li&gt;
+&lt;li&gt;Data is guaranteed to stay out of the hands of the service (like Facebook).&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3 id=&quot;p2p-in-the-browser&quot;&gt;P2P in the browser&lt;/h3&gt;
 &lt;p&gt;Since P2P results in more rapid, reliable and secure transfer of data, it’s a
