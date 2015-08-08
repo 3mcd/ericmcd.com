@@ -112,10 +112,10 @@ in the [PeerJS docs](http://peerjs.com/docs "PeerJS docs").
 
 As you can see, building applications with WebRTC is a piece of cake, especially
 when using a library like PeerJS. But regardless of it's ease of use,
-is the protocol going to drastically change the Web? There are plenty of sample
-projects around that demonstrate the capabilities of WebRTC, but does the
-technology have any place in web applications other than simple P2P games and
-Skype clones?
+is the protocol going to drastically change the Web? There are [plenty of sample
+projects](https://github.com/webrtc/samples "WebRTC samples") around that
+demonstrate the capabilities of WebRTC, but does the technology have any place
+in web applications other than simple P2P games and Skype clones?
 
 I tend to envision wacky application ideas during my commute. What else would
 I be doing in gridlock traffic? I imagined a sort-of live blogging platform,
