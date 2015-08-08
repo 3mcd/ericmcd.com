@@ -5,91 +5,13 @@
     <atom:link href="http://ericmcd.com//feed.xml" rel="self" type="application/rss+xml"></atom:link>
     <link>http://ericmcd.com/</link>
     <description>fun with the web</description>
-    <pubDate>Thu, 20 Nov 2014 07:30:00 -0500</pubDate>
+    <pubDate>Fri, 07  Aug 2015 11:42:00 -0400</pubDate>
     <generator>Wintersmith - https://github.com/jnordberg/wintersmith</generator>
     <language>en</language>
     <item>
-      <title>Sort By Relationship With Eloquent ORM</title>
-      <link>http://ericmcd.com//articles/eloquent-sort-by-relationship/</link>
-      <pubDate>Thu, 20 Nov 2014 07:30:00 -0500</pubDate>
-      <guid isPermaLink="true">http://ericmcd.com//articles/eloquent-sort-by-relationship/</guid>
-      <author></author>
-      <description>&lt;p&gt;Sort and order an API resource by relationship in Laravel’s object relational mapper
-&lt;span class=&quot;more&quot;&gt;&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;I decided to build an API in &lt;a href=&quot;http://laravel.com/&quot; title=&quot;Laravel Website&quot;&gt;Laravel&lt;/a&gt; as the backend for my team’s time tracking application. Laravel has all of the necessary tools to build full-scale applications, and I used it for it’s superb router, controllers, query builder and object relational mapper (dubbed &lt;a href=&quot;http://laravel.com/docs/4.2/eloquent&quot; title=&quot;Eloquent Docs&quot;&gt;Eloquent&lt;/a&gt;).&lt;/p&gt;
-&lt;p&gt;I was having trouble sorting collections pulled from my endpoints. Basic sorting with Laravel’s query builder is &lt;a href=&quot;http://laravel.com/docs/4.2/queries#selects&quot; title=&quot;Laravel Query Builder&quot;&gt;dead simple&lt;/a&gt;, but I wanted to sort by properties on related models. In this particular case, I wanted to sort a set of sub-projects by the name of their parent project. Simple, right?&lt;/p&gt;
-&lt;p&gt;It appears Eloquent doesn’t have this functionality out of the box, but fortunately Laravel has a useful feature called &lt;a href=&quot;http://laravel.com/docs/4.2/eloquent#query-scopes&quot; title=&quot;Laravel Query Scopes&quot;&gt;Query Scopes&lt;/a&gt; that allow for custom, chainable Eloquent methods.&lt;/p&gt;
-&lt;p&gt;Query scopes are easy to define. Simply prefix the name of a static method on a model with “scope”:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;lang-php&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;ResourceModel&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;Eloquent&lt;/span&gt; &lt;/span&gt;{
-
-    &lt;span class=&quot;keyword&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;scopeParseSort&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(&lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$sort&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$order&lt;/span&gt;)&lt;/span&gt;
-    &lt;/span&gt;{
-        &lt;span class=&quot;comment&quot;&gt;/* ... */&lt;/span&gt;
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;You can now access this method as a static member on the &lt;code&gt;ResourceModel&lt;/code&gt; class, like &lt;code&gt;ResourceModel::parseSort()&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;I wanted to perform the sorting without using multiple query parameters in the request. The method I devised splits a single &lt;code&gt;sort&lt;/code&gt; query parameter by a delimiter and makes a few assumptions:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;the first segment (&lt;code&gt;$split[0]&lt;/code&gt;) is the other table’s name&lt;/li&gt;
-&lt;li&gt;the second segment (&lt;code&gt;$split[1]&lt;/code&gt;) is the column to sort by&lt;/li&gt;
-&lt;li&gt;the foreign key name is the singular form of the other table’s name + “_id”&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Below is an example implementation:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;lang-php&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;scopeParseSort&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(&lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$sort&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$order&lt;/span&gt;)&lt;/span&gt;
-&lt;/span&gt;{
-    &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt; (!&lt;span class=&quot;keyword&quot;&gt;isset&lt;/span&gt;(&lt;span class=&quot;variable&quot;&gt;$sort&lt;/span&gt;)) {
-        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt;;
-    }
-
-    &lt;span class=&quot;variable&quot;&gt;$split&lt;/span&gt; = explode(&lt;span class=&quot;string&quot;&gt;'.'&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$sort&lt;/span&gt;);
-
-    &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt; (count(&lt;span class=&quot;variable&quot;&gt;$split&lt;/span&gt;) &amp;gt; &lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;) {
-        &lt;span class=&quot;variable&quot;&gt;$sortTable&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$split&lt;/span&gt;[&lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;];
-        &lt;span class=&quot;variable&quot;&gt;$sortColumn&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$split&lt;/span&gt;[&lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;];
-        &lt;span class=&quot;variable&quot;&gt;$fkPrefix&lt;/span&gt; = rtrim(&lt;span class=&quot;variable&quot;&gt;$sortTable&lt;/span&gt;, &lt;span class=&quot;string&quot;&gt;'s'&lt;/span&gt;);
-
-        &lt;span class=&quot;comment&quot;&gt;// ResourceModel method that returns name of table as a string,&lt;/span&gt;
-        &lt;span class=&quot;comment&quot;&gt;// see https://github.com/laravel/framework/issues/1436&lt;/span&gt;
-        &lt;span class=&quot;variable&quot;&gt;$table&lt;/span&gt; = &lt;span class=&quot;keyword&quot;&gt;self&lt;/span&gt;::getTableName();
-        &lt;span class=&quot;variable&quot;&gt;$keyName&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$table&lt;/span&gt; . &lt;span class=&quot;string&quot;&gt;'.'&lt;/span&gt; . &lt;span class=&quot;variable&quot;&gt;$fkPrefix&lt;/span&gt; . &lt;span class=&quot;string&quot;&gt;'_id'&lt;/span&gt;;
-
-        &lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt;
-            -&amp;gt;join(&lt;span class=&quot;variable&quot;&gt;$sortTable&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$keyName&lt;/span&gt;, &lt;span class=&quot;string&quot;&gt;'='&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$sortTable&lt;/span&gt; . &lt;span class=&quot;string&quot;&gt;'.id'&lt;/span&gt;)
-            -&amp;gt;orderBy(&lt;span class=&quot;variable&quot;&gt;$sortColumn&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$order&lt;/span&gt;)
-            -&amp;gt;addSelect(&lt;span class=&quot;variable&quot;&gt;$table&lt;/span&gt; . &lt;span class=&quot;string&quot;&gt;'.*'&lt;/span&gt;);
-    } &lt;span class=&quot;keyword&quot;&gt;else&lt;/span&gt; {
-        &lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt;-&amp;gt;orderBy(&lt;span class=&quot;variable&quot;&gt;$sort&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$order&lt;/span&gt;);
-    }
-
-    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt;;
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;code&gt;parseSort&lt;/code&gt; is then executable as a static member on classes that inherit from &lt;code&gt;ResourceModel&lt;/code&gt;:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;lang-php&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;ProjectController&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;ResourceController&lt;/span&gt; &lt;/span&gt;{
-
-    &lt;span class=&quot;keyword&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;()&lt;/span&gt;
-    &lt;/span&gt;{
-        &lt;span class=&quot;variable&quot;&gt;$sort&lt;/span&gt; = Input::get(&lt;span class=&quot;string&quot;&gt;'sort'&lt;/span&gt;, &lt;span class=&quot;string&quot;&gt;'id'&lt;/span&gt;);
-        &lt;span class=&quot;variable&quot;&gt;$order&lt;/span&gt; = Input::get(&lt;span class=&quot;string&quot;&gt;'order'&lt;/span&gt;, &lt;span class=&quot;string&quot;&gt;'asc'&lt;/span&gt;);
-
-        &lt;span class=&quot;comment&quot;&gt;// Execute parseSort with the sort and order `GET` parameters&lt;/span&gt;
-        &lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt; = SubProject::parseSort(&lt;span class=&quot;variable&quot;&gt;$sort&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$order&lt;/span&gt;);
-
-        &lt;span class=&quot;comment&quot;&gt;// ResourceController method, retrieve and format the collection of models&lt;/span&gt;
-        &lt;span class=&quot;variable&quot;&gt;$resource&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$this&lt;/span&gt;-&amp;gt;getResource(&lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt;);
-
-        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;variable&quot;&gt;$this&lt;/span&gt;-&amp;gt;respond(&lt;span class=&quot;variable&quot;&gt;$resource&lt;/span&gt;);
-    }
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;With this implementation, the response from the URI “/api/sub_projects?sort=projects.name” would include a collection of sub-projects sorted by the names of their parent projects.&lt;/p&gt;
-&lt;p&gt;Keep in mind that there are some major limitations with the current state of &lt;code&gt;queryParseSort&lt;/code&gt;. You can only search by properties that are one relationship deep, and foreign keys/tables must follow strict naming conventions.&lt;/p&gt;
-</description>
-    </item>
-    <item>
       <title>Browsers as Peers</title>
       <link>http://ericmcd.com//articles/browsers-as-peers/</link>
-      <pubDate>Thu, 20 Nov 2014 07:30:00 -0500</pubDate>
+      <pubDate>Fri, 07  Aug 2015 11:42:00 -0400</pubDate>
       <guid isPermaLink="true">http://ericmcd.com//articles/browsers-as-peers/</guid>
       <author></author>
       <description>&lt;p&gt;Visions of peer-to-peer applications in the browser
@@ -205,6 +127,84 @@ browser!&lt;/p&gt;
 &lt;p&gt;In any case, I think we’ll be seeing a lot of WebRTC in the near future.&lt;/p&gt;
 &lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.min.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
 &lt;script src=&quot;main.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+</description>
+    </item>
+    <item>
+      <title>Sort By Relationship With Eloquent ORM</title>
+      <link>http://ericmcd.com//articles/eloquent-sort-by-relationship/</link>
+      <pubDate>Thu, 20 Nov 2014 07:30:00 -0500</pubDate>
+      <guid isPermaLink="true">http://ericmcd.com//articles/eloquent-sort-by-relationship/</guid>
+      <author></author>
+      <description>&lt;p&gt;Sort and order an API resource by relationship in Laravel’s object relational mapper
+&lt;span class=&quot;more&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;I decided to build an API in &lt;a href=&quot;http://laravel.com/&quot; title=&quot;Laravel Website&quot;&gt;Laravel&lt;/a&gt; as the backend for my team’s time tracking application. Laravel has all of the necessary tools to build full-scale applications, and I used it for it’s superb router, controllers, query builder and object relational mapper (dubbed &lt;a href=&quot;http://laravel.com/docs/4.2/eloquent&quot; title=&quot;Eloquent Docs&quot;&gt;Eloquent&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;I was having trouble sorting collections pulled from my endpoints. Basic sorting with Laravel’s query builder is &lt;a href=&quot;http://laravel.com/docs/4.2/queries#selects&quot; title=&quot;Laravel Query Builder&quot;&gt;dead simple&lt;/a&gt;, but I wanted to sort by properties on related models. In this particular case, I wanted to sort a set of sub-projects by the name of their parent project. Simple, right?&lt;/p&gt;
+&lt;p&gt;It appears Eloquent doesn’t have this functionality out of the box, but fortunately Laravel has a useful feature called &lt;a href=&quot;http://laravel.com/docs/4.2/eloquent#query-scopes&quot; title=&quot;Laravel Query Scopes&quot;&gt;Query Scopes&lt;/a&gt; that allow for custom, chainable Eloquent methods.&lt;/p&gt;
+&lt;p&gt;Query scopes are easy to define. Simply prefix the name of a static method on a model with “scope”:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;lang-php&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;ResourceModel&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;Eloquent&lt;/span&gt; &lt;/span&gt;{
+
+    &lt;span class=&quot;keyword&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;scopeParseSort&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(&lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$sort&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$order&lt;/span&gt;)&lt;/span&gt;
+    &lt;/span&gt;{
+        &lt;span class=&quot;comment&quot;&gt;/* ... */&lt;/span&gt;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;You can now access this method as a static member on the &lt;code&gt;ResourceModel&lt;/code&gt; class, like &lt;code&gt;ResourceModel::parseSort()&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;I wanted to perform the sorting without using multiple query parameters in the request. The method I devised splits a single &lt;code&gt;sort&lt;/code&gt; query parameter by a delimiter and makes a few assumptions:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;the first segment (&lt;code&gt;$split[0]&lt;/code&gt;) is the other table’s name&lt;/li&gt;
+&lt;li&gt;the second segment (&lt;code&gt;$split[1]&lt;/code&gt;) is the column to sort by&lt;/li&gt;
+&lt;li&gt;the foreign key name is the singular form of the other table’s name + “_id”&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Below is an example implementation:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;lang-php&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;scopeParseSort&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(&lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$sort&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$order&lt;/span&gt;)&lt;/span&gt;
+&lt;/span&gt;{
+    &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt; (!&lt;span class=&quot;keyword&quot;&gt;isset&lt;/span&gt;(&lt;span class=&quot;variable&quot;&gt;$sort&lt;/span&gt;)) {
+        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt;;
+    }
+
+    &lt;span class=&quot;variable&quot;&gt;$split&lt;/span&gt; = explode(&lt;span class=&quot;string&quot;&gt;'.'&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$sort&lt;/span&gt;);
+
+    &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt; (count(&lt;span class=&quot;variable&quot;&gt;$split&lt;/span&gt;) &amp;gt; &lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;) {
+        &lt;span class=&quot;variable&quot;&gt;$sortTable&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$split&lt;/span&gt;[&lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;];
+        &lt;span class=&quot;variable&quot;&gt;$sortColumn&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$split&lt;/span&gt;[&lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;];
+        &lt;span class=&quot;variable&quot;&gt;$fkPrefix&lt;/span&gt; = rtrim(&lt;span class=&quot;variable&quot;&gt;$sortTable&lt;/span&gt;, &lt;span class=&quot;string&quot;&gt;'s'&lt;/span&gt;);
+
+        &lt;span class=&quot;comment&quot;&gt;// ResourceModel method that returns name of table as a string,&lt;/span&gt;
+        &lt;span class=&quot;comment&quot;&gt;// see https://github.com/laravel/framework/issues/1436&lt;/span&gt;
+        &lt;span class=&quot;variable&quot;&gt;$table&lt;/span&gt; = &lt;span class=&quot;keyword&quot;&gt;self&lt;/span&gt;::getTableName();
+        &lt;span class=&quot;variable&quot;&gt;$keyName&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$table&lt;/span&gt; . &lt;span class=&quot;string&quot;&gt;'.'&lt;/span&gt; . &lt;span class=&quot;variable&quot;&gt;$fkPrefix&lt;/span&gt; . &lt;span class=&quot;string&quot;&gt;'_id'&lt;/span&gt;;
+
+        &lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt;
+            -&amp;gt;join(&lt;span class=&quot;variable&quot;&gt;$sortTable&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$keyName&lt;/span&gt;, &lt;span class=&quot;string&quot;&gt;'='&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$sortTable&lt;/span&gt; . &lt;span class=&quot;string&quot;&gt;'.id'&lt;/span&gt;)
+            -&amp;gt;orderBy(&lt;span class=&quot;variable&quot;&gt;$sortColumn&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$order&lt;/span&gt;)
+            -&amp;gt;addSelect(&lt;span class=&quot;variable&quot;&gt;$table&lt;/span&gt; . &lt;span class=&quot;string&quot;&gt;'.*'&lt;/span&gt;);
+    } &lt;span class=&quot;keyword&quot;&gt;else&lt;/span&gt; {
+        &lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt;-&amp;gt;orderBy(&lt;span class=&quot;variable&quot;&gt;$sort&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$order&lt;/span&gt;);
+    }
+
+    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt;;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;parseSort&lt;/code&gt; is then executable as a static member on classes that inherit from &lt;code&gt;ResourceModel&lt;/code&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;lang-php&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;ProjectController&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;ResourceController&lt;/span&gt; &lt;/span&gt;{
+
+    &lt;span class=&quot;keyword&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;()&lt;/span&gt;
+    &lt;/span&gt;{
+        &lt;span class=&quot;variable&quot;&gt;$sort&lt;/span&gt; = Input::get(&lt;span class=&quot;string&quot;&gt;'sort'&lt;/span&gt;, &lt;span class=&quot;string&quot;&gt;'id'&lt;/span&gt;);
+        &lt;span class=&quot;variable&quot;&gt;$order&lt;/span&gt; = Input::get(&lt;span class=&quot;string&quot;&gt;'order'&lt;/span&gt;, &lt;span class=&quot;string&quot;&gt;'asc'&lt;/span&gt;);
+
+        &lt;span class=&quot;comment&quot;&gt;// Execute parseSort with the sort and order `GET` parameters&lt;/span&gt;
+        &lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt; = SubProject::parseSort(&lt;span class=&quot;variable&quot;&gt;$sort&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$order&lt;/span&gt;);
+
+        &lt;span class=&quot;comment&quot;&gt;// ResourceController method, retrieve and format the collection of models&lt;/span&gt;
+        &lt;span class=&quot;variable&quot;&gt;$resource&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$this&lt;/span&gt;-&amp;gt;getResource(&lt;span class=&quot;variable&quot;&gt;$query&lt;/span&gt;);
+
+        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;variable&quot;&gt;$this&lt;/span&gt;-&amp;gt;respond(&lt;span class=&quot;variable&quot;&gt;$resource&lt;/span&gt;);
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;With this implementation, the response from the URI “/api/sub_projects?sort=projects.name” would include a collection of sub-projects sorted by the names of their parent projects.&lt;/p&gt;
+&lt;p&gt;Keep in mind that there are some major limitations with the current state of &lt;code&gt;queryParseSort&lt;/code&gt;. You can only search by properties that are one relationship deep, and foreign keys/tables must follow strict naming conventions.&lt;/p&gt;
 </description>
     </item>
   </channel>

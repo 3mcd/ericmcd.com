@@ -1,7 +1,7 @@
 ---
 title: Browsers as Peers
 author: eric
-date: 2014-11-20 7:30
+date: 2015-8-07 11:42
 template: article.jade
 ---
 Visions of peer-to-peer applications in the browser
