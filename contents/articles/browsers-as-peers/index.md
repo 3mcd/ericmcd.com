@@ -8,11 +8,10 @@ Visions of peer-to-peer applications in the browser
 <span class="more"></span>
 
 I recently developed an interest in peer-to-peer (or P2P) communication in
-the browser. Simply put, the term "P2P" refers to a model where clients also act
-as servers and transfer data without the help of a central server.
-P2P communication is considered a decentralized model, as opposed to a
-centralized model like Facebook Chat, where messages pass through Facebook's
-server(s).
+the browser. Simply put, the term "P2P" refers to a model where clients can communicate
+with eachother without the help of a central server. P2P communication is
+considered a decentralized model, as opposed to a centralized model like
+Facebook Chat, where messages pass through Facebook's server(s).
 
 In my opinion, the two most notable benefits of P2P are:
 - Lower latency and increased reliability (no central point of failure).
