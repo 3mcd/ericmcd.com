@@ -1,1 +1,0 @@
-C# Delegates for JavaScript Programmers
