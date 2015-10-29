@@ -24,8 +24,7 @@ h2, h3, h4, h5, h6 {
 }
 
 body {
-  background-color: #f6f6f6;
-  font-family: 'Droid Serif', 'Georgia', serif;
+  font-family: 'Droid Sans', serif;
   font-size: 19px;
   line-height: 1.6;
   text-rendering: optimizeLegibility;

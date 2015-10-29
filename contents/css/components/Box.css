@@ -1,7 +1,6 @@
 /** @define Box; use-strict */
 
 .Box {
-  background-color: #fdfdfd;
   padding: 0.5em;
   margin: 0.5em;
 }
@@ -11,13 +10,12 @@
 }
 
 .Box--aside {
-  background-color: #5F5E6E;
-  color: #fff;
+  background-color: #efefef;
+  color: #5F5E6E;
 }
 
 .Box--aside code {
-  color: #fff;
-  border-bottom: 1px solid #fff;
+  border-bottom: 1px solid #ddd;
 }
 
 .Box--transparent {
