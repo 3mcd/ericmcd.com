@@ -109,4 +109,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[1]);
+},{}]

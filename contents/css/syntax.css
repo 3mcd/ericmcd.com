@@ -34,6 +34,7 @@ pre .keyword, pre .javascript .function {
 
 pre {
   white-space: pre-wrap;
+  margin: 2em 0;
 }
 
 code {
@@ -46,8 +47,8 @@ pre code {
   color: #5F5E6E;
   display: block;
   line-height: 1.5;
-  padding: 10px;
-  font-size: 0.8em;
+  /*padding: 10px;*/
+  /*font-size: 0.8em;*/
 }
 
 @font-face {

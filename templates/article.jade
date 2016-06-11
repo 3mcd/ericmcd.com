@@ -12,8 +12,7 @@ block header
     div.Box.Box--transparent.Box--snap
       div.Box.Box--transparent
         a(href=contents.index.url).Header-heading
-          each result, i in locals.name.split(' ')
-            h1= result
+          h1= locals.name
       div.Box.Box--transparent
         span.Date.Header-info= moment.utc(page.date).format('DD MMMM YYYY')
       div.Box.Box--transparent.Box--thin

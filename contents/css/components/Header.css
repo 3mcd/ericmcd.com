@@ -5,14 +5,13 @@
   width: 100%;
 }
 
-.Header-heading,
-.Header-heading * {
+.Header-heading {
   margin: 0;
   display: block;
   text-decoration: none;
-  line-height: 1em;
+  line-height: 1.5em;
   border: 0;
-  font-size: 1.4em;
+  font-size: 1.3em;
   font-family: 'Helvetica', sans-serif;
 }
 
