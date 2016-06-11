@@ -1,3 +1,13 @@
+@font-face {
+  font-family: 'Pragmata Pro';
+  src: url('/font/PragmataPro.eot');
+  src: url('/font/PragmataPro.eot?#iefix') format('embedded-opentype'),
+    url('/font/PragmataPro.woff') format('woff'),
+    url('/font/PragmataPro.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 @import 'utilities/u-cf.css';
 
 @import 'components/Article.css';
